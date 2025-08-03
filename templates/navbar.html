@@ -1,0 +1,156 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!-- Alpine.js is required -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<header
+  x-data="{ mobileOpen: false }"
+  class="bg-white/20 dark:bg-gray-900/40 backdrop-blur-md shadow-lg border-b border-white/30 dark:border-gray-700"
+>
+  <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="{% url 'store' %}" class="flex items-center space-x-2">
+      <img src="{% static 'images/products/logof.png' %}" alt="Ecom Logo" class="h-8 w-8 rounded-full shadow-md" />
+      <span class="text-xl font-semibold text-gray-800 dark:text-white">Ecom</span>
+    </a>
+
+    <!-- Search (Desktop) -->
+    <form method="get" action="{% url 'store' %}" 
+      class="hidden md:flex items-center gap-2 bg-white/30 dark:bg-gray-800/40 backdrop-blur-md border border-white/30 dark:border-gray-700 rounded-2xl shadow px-4 py-2 focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
+      
+      <!-- Icon -->
+      <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.65 6.15z"></path>
+      </svg>
+
+      <!-- Input -->
+      <input
+        type="text"
+        name="search_query"
+        placeholder="Search products..."
+        value="{{ search_query|default:'' }}"
+        class="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
+      />
+
+      <!-- Button -->
+      <button type="submit"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-xl text-sm font-medium shadow-md transition">
+        Search
+      </button>
+    </form>
+
+    <!-- Mobile Menu Button -->
+    <button
+      @click="mobileOpen = !mobileOpen"
+      class="md:hidden flex flex-col justify-center items-center w-10 h-10"
+      aria-label="Toggle menu"
+    >
+      <span class="w-6 h-0.5 bg-gray-800 dark:bg-white mb-1"></span>
+      <span class="w-6 h-0.5 bg-gray-800 dark:bg-white mb-1"></span>
+      <span class="w-6 h-0.5 bg-gray-800 dark:bg-white"></span>
+    </button>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex items-center space-x-4">
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'account' %}" class="ml-4">
+          <img src="{{ profile.profile_image.url }}" alt="Profile"
+          class="w-10 h-10 rounded-full border-2 border-indigo-500 object-cover hover:scale-105 transition" />
+        </a>
+        <a href="{% url 'logout' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">Login/Sign Up</a>
+      {% endif %}
+
+      <!-- Wishlist -->
+      <a href="{% url 'wishlist' %}" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-700 transition cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24" stroke="none">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <span class="font-semibold text-gray-800 dark:text-white">{{ wishlist_count|default:"0" }}</span>
+      </a>
+
+      <!-- Cart -->
+      <a href="{% url 'cart' %}" class="flex items-center gap-2">
+        <img src="{% static 'images/products/cart.png' %}" alt="Cart" class="w-6 h-6 rounded-full" />
+        <span id="cart-total-desktop" class="font-semibold">{{ cart_items }}</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div
+    x-show="mobileOpen"
+    @click.outside="mobileOpen = false"
+    x-transition
+    class="md:hidden px-4 pb-4 pt-2"
+  >
+    <!-- Search (Mobile) -->
+    <form method="get" action="{% url 'store' %}" class="mb-4">
+      <div class="flex items-center bg-white/90 dark:bg-gray-800 border border-white/30 dark:border-gray-700 rounded-lg shadow px-3 py-2">
+        <input
+          type="text"
+          name="search_query"
+          placeholder="Search..."
+          value="{{ search_query|default:'' }}"
+          class="flex-grow bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
+        />
+        <button type="submit" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg shadow">
+          Go
+        </button>
+      </div>
+    </form>
+
+    <!-- Menu Links -->
+    <ul class="bg-white/90 dark:bg-gray-800 text-gray-800 dark:text-white shadow-xl rounded-lg p-4 space-y-3 w-full">
+      <li><a href="{% url 'store' %}" class="block hover:text-indigo-600 dark:hover:text-indigo-400">Home</a></li>
+
+      {% if request.user.is_authenticated %}
+        <li><a href="{% url 'account' %}" class="block hover:text-indigo-600 dark:hover:text-indigo-400">Account</a></li>
+        <li><a href="{% url 'logout' %}" class="block text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'login' %}" class="block text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">Login/Sign Up</a></li>
+      {% endif %}
+
+      <li>
+        <a href="{% url 'wishlist' %}" class="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24" stroke="none">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          Wishlist <span class="font-semibold">{{ wishlist_count|default:"0" }}</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="{% url 'cart' %}" class="flex items-center gap-2">
+          <img src="{% static 'images/products/book.png' %}" alt="Cart" class="w-6 h-6 rounded-full" />
+          <span id="cart-total-mobile" class="font-semibold">{{ cart_items }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<!-- Dark Mode Script -->
+<script>
+  (function () {
+    try {
+      const userPref = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (userPref === 'dark' || (!userPref && systemPrefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {}
+  })();
+
+  function toggleDarkMode() {
+    const htmlEl = document.documentElement;
+    htmlEl.classList.toggle('dark');
+    localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+  }
+</script>

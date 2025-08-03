@@ -1,0 +1,17 @@
+{% extends 'main.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">❤️ Your Wishlist</h2>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+  {% for product in wishlist.products.all %}
+    <div class="bg-white/30 p-4 rounded-lg shadow-md">
+      <img src="{{ product.imageURL }}" class="w-full h-40 object-cover rounded mb-2" alt="{{ product.name }}">
+      <h3 class="text-lg font-semibold">{{ product.name }}</h3>
+      <p class="text-gray-700">${{ product.price }}</p>
+      <a href="{% url 'remove_from_wishlist' product.id %}" class="mt-2 inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Remove</a>
+    </div>
+  {% empty %}
+    <p class="text-gray-600">Your wishlist is empty.</p>
+  {% endfor %}
+</div>
+{% endblock %}

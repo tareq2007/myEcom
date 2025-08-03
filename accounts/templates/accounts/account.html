@@ -1,0 +1,92 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="my-12">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Profile Card -->
+      <div
+        class="backdrop-blur-xl bg-white/30 dark:bg-gray-800/30 p-6 rounded-2xl border border-white/20 dark:border-gray-500/20 shadow-xl transition transform hover:scale-[1.03] hover:shadow-2xl cursor-pointer"
+      >
+        <a
+          class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white py-1 px-4 rounded-full mb-4 shadow-md hover:shadow-lg transition"
+          href="{% url 'edit-account' %}"
+        >
+          <i class="im im-edit mr-1"></i>Edit
+        </a>
+        <img
+          class="w-52 h-52 mx-auto rounded-full border border-white/30 shadow-lg object-cover"
+          src="{{ profile.imageURL }}"
+          alt="Profile Image"
+        />
+        <h2 class="mt-4 text-2xl font-semibold text-gray-800 dark:text-white">{{ profile.name }}</h2>
+        <p class="text-sm text-gray-700 dark:text-gray-300">{{ profile.short_into }}</p>
+        <p class="mt-1 text-gray-700 dark:text-gray-400">📍 Based in {{ profile.location }}</p>
+
+        <!-- Social Icons -->
+        <ul class="flex justify-center mt-4 space-x-4 text-lg text-gray-600 dark:text-gray-300">
+          {% if profile.social_github %}
+          <li><a href="{{ profile.social_github }}" target="_blank" title="GitHub"><i class="im im-github"></i></a></li>
+          {% endif %}
+          {% if profile.social_twitter %}
+          <li><a href="{{ profile.social_twitter }}" target="_blank" title="Twitter"><i class="im im-twitter"></i></a></li>
+          {% endif %}
+          {% if profile.social_linkedin %}
+          <li><a href="{{ profile.social_linkedin }}" target="_blank" title="LinkedIn"><i class="im im-linkedin"></i></a></li>
+          {% endif %}
+          {% if profile.social_website %}
+          <li><a href="{{ profile.social_website }}" target="_blank" title="Website"><i class="im im-globe"></i></a></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- About + Skills + Projects -->
+      <div class="md:col-span-2 space-y-8">
+
+        <!-- About -->
+        <div
+          class="backdrop-blur-xl bg-white/30 dark:bg-gray-800/30 p-6 rounded-2xl border border-white/20 dark:border-gray-500/20 shadow-xl transition transform hover:scale-[1.02] hover:shadow-2xl cursor-default"
+        >
+          <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">About Me</h3>
+          <p class="text-gray-700 dark:text-gray-300">{{ profile.bio }}</p>
+        </div>
+
+
+<!-- Purchase History -->
+<div
+  class="backdrop-blur-xl bg-white/30 dark:bg-gray-800/30 p-6 rounded-2xl border border-white/20 dark:border-gray-500/20 shadow-xl transition transform hover:scale-[1.02] hover:shadow-2xl cursor-default"
+>
+  <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">🛒 Purchase History</h3>
+
+  {% if completed_orders %}
+    <ul class="space-y-4">
+      {% for order in completed_orders %}
+        <li class="border border-white/20 dark:border-gray-600 rounded-lg p-4 shadow bg-white/10 dark:bg-gray-700/20">
+          <div class="flex justify-between items-center">
+            <span class="font-medium text-gray-800 dark:text-gray-100">Order #{{ order.id }}</span>
+            <span class="text-sm text-gray-600 dark:text-gray-300">{{ order.date_ordered|date:"F j, Y" }}</span>
+          </div>
+          <ul class="ml-4 mt-2 text-sm text-gray-700 dark:text-gray-200 list-disc">
+            {% for item in order.orderitem_set.all %}
+              <li>{{ item.product.name }} × {{ item.quantity }}</li>
+            {% endfor %}
+          </ul>
+          <div class="text-right text-indigo-600 font-semibold mt-2">
+            Total: ${{ order.get_cart_total|floatformat:2 }}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-600 dark:text-gray-400 italic">You haven’t purchased anything yet.</p>
+  {% endif %}
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

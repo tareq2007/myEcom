@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+{% load static %}
+<html > <!-- Add/remove 'dark' via JS to toggle dark mode -->
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <script>
+    // Immediately set the theme on page load before rendering
+    (function() {
+      try {
+        const userPref = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (userPref === 'dark' || (!userPref && systemPrefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {
+        // fallback, do nothing
+      }
+    })();
+
+    function toggleDarkMode() {
+      const htmlEl = document.documentElement;
+      htmlEl.classList.toggle('dark');
+
+      if (htmlEl.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
+      } else {
+        localStorage.setItem('theme', 'light');
+      }
+    }
+  </script>
+  <!-- Tailwind CDN with config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '#121829',
+            sidebar: '#1C2333',
+            card: '#20293B',
+            primary: '#36C2F0',
+            muted: '#94A3B8',
+            text: '#E3E8F4',
+          },
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
+
+  <!-- Custom CSS -->
+  {% comment %} <link rel="stylesheet" href="{% static 'CSS/main.css' %}" /> {% endcomment %}
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script type='text/javascript' >
+    var user = '{{request.user}}'
+
+    function getToken(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getToken('csrftoken');
+
+function getCookie(name) {
+    // Split cookie string and get all individual name=value pairs in an array
+    var cookieArr = document.cookie.split(";");
+
+    // Loop through the array elements
+    for(var i = 0; i < cookieArr.length; i++) {
+        var cookiePair = cookieArr[i].split("=");
+
+        /* Removing whitespace at the beginning of the cookie name
+        and compare it with the given string */
+        if(name == cookiePair[0].trim()) {
+            // Decode the cookie value and return
+            return decodeURIComponent(cookiePair[1]);
+        }
+    }
+
+    // Return null if not found
+    return null;
+}
+    var cart = JSON.parse(getCookie('cart'))
+    if (cart == undefined){
+      cart = {}
+      document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
+      console.log('cart',cart)
+    }
+
+
+  </script>
+
+  <title>For my Capabilities!</title>
+</head>
+
+<body class="bg-[#e0e5ec] dark:bg-[#2d3748] text-gray-800 dark:text-gray-100 font-inter">
+
+  {% include 'navbar.html' %}
+
+  <!-- Flash Messages -->
+{% if messages %}
+  <div class="fixed top-4 right-4 w-96 z-50">
+    {% for message in messages %}
+      <div
+        class="
+          flex justify-between items-center px-5 py-3 mb-4 rounded-lg shadow-md
+          text-sm font-medium
+          {% if message.tags == 'success' %}
+            bg-green-100 text-green-800
+          {% elif message.tags == 'error' or message.tags == 'danger' %}
+            bg-red-100 text-red-800
+          {% elif message.tags == 'warning' %}
+            bg-yellow-100 text-yellow-800
+          {% else %}
+            bg-blue-100 text-blue-800
+          {% endif %}
+        "
+        role="alert"
+      >
+        <p class="mr-4">{{ message }}</p>
+        <button
+          type="button"
+          aria-label="Close"
+          class="text-lg font-bold leading-none hover:text-black focus:outline-none"
+          onclick="this.parentElement.remove();"
+        >
+          &times;
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
+  <!-- Page Content -->
+  {% block content %}
+  {% endblock content %}
+
+  <!-- Optional: Dark Mode Toggle Button -->
+  <div class="fixed bottom-4 right-4">
+<button onclick="toggleDarkMode()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+  Toggle Dark Mode
+</button>
+
+  </div>
+  <script type='text/javascript' src="{% static 'JS/cart.js' %}" ></script>
+</body>
+
+</html>

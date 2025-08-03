@@ -1,0 +1,79 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+
+  <!-- Top section: Continue Shopping + Summary -->
+  <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow rounded-lg p-6 mb-8">
+    <div class="flex justify-between items-center mb-4">
+      <a href="{% url 'store' %}" class="text-dark dark:text-indigo-400 hover:underline flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+        <span class="text-lg">&#x2190;</span> Continue Shopping
+      </a>
+
+      <a href="{% url 'checkout' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+        Checkout
+      </a>
+    </div>
+
+    <div class="flex justify-between text-sm sm:text-base font-semibold">
+      <p>Items: <span class="font-normal">{{order.get_cart_items}}</span></p>
+      <p>Total: <span class="font-normal">${{order.get_cart_total|floatformat:2}}</span></p>
+    </div>
+  </div>
+
+  <!-- Cart Table Header -->
+  <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow rounded-lg p-6">
+    <div class="hidden sm:grid grid-cols-5 gap-4 font-semibold border-b border-gray-300 dark:border-gray-700 pb-2 mb-4">
+      <div class="col-span-2">Item</div>
+      <div>Price</div>
+      <div>Quantity</div>
+      <div>Total</div>
+    </div>
+
+    <!-- Cart Items -->
+    {% for item in items %}
+    <div class="grid grid-cols-5 gap-4 items-center py-4 border-b border-gray-200 dark:border-gray-700 text-sm sm:text-base">
+      <!-- Product Image -->
+      <div class="col-span-2 flex items-center gap-4">
+        <img src="{{item.product.imageURL}}" alt="Product Image" class="w-14 h-14 object-cover rounded-md bg-gray-200 dark:bg-gray-700" />
+        <p>{{item.product.name}}</p>
+      </div>
+
+      <!-- Price -->
+      <div>
+        <p>${{item.product.price|floatformat:2}}</p>
+      </div>
+
+      <!-- Quantity -->
+      <div>
+        <p class="mb-1">{{item.quantity}}</p>
+        <div class="flex flex-col items-center gap-1">
+          <img data-product="{{item.product.id}}" data-action="add" src="{% static 'images/products/arrow-up.png' %}" class="chg-quantity w-4 cursor-pointer update-cart" />
+          <img data-product="{{item.product.id}}" data-action="remove" src="{% static 'images/products/arrow-down.png' %}" class="chg-quantity w-4 cursor-pointer update-cart" />
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div>
+        <p>${{item.get_total}}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Optional: Dark Mode Toggle Script -->
+<script>
+  (function () {
+    try {
+      const userPref = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (userPref === 'dark' || (!userPref && systemPrefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {}
+  })();
+</script>
+{% endblock %}

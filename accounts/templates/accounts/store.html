@@ -1,0 +1,103 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+
+<div class="flex min-h-screen bg-gradient-to-br from-blue-100 via-green to-purple-100 relative">
+  <!-- Hoverable Sidebar -->
+  <aside class="fixed top-0 left-0 h-screen overflow-y-auto bg-white/20 backdrop-blur-md border-r border-white/30 shadow-lg z-30 transition-all duration-300 w-16 hover:w-64 group">
+    <div class="mt-10 text-gray-800 transition-all duration-300 px-2 hover:px-6">
+      <h2 class="text-xl font-bold opacity-0 group-hover:opacity-100 transition-opacity mb-4">Categories</h2>
+      <ul class="space-y-4 font-medium">
+        <li>
+          <a href="{% url 'store' %}" class="flex items-center space-x-2 hover:text-blue-600 transition">
+            <span class="w-2 h-2 bg-blue-600 rounded-full group-hover:hidden"></span>
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity">All Products</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center space-x-2 hover:text-blue-600 transition">
+            <span class="w-2 h-2 bg-green-600 rounded-full group-hover:hidden"></span>
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity">Electronics</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center space-x-2 hover:text-blue-600 transition">
+            <span class="w-2 h-2 bg-pink-600 rounded-full group-hover:hidden"></span>
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity">Clothing</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center space-x-2 hover:text-blue-600 transition">
+            <span class="w-2 h-2 bg-pink-600 rounded-full group-hover:hidden"></span>
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity">Digital</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center space-x-2 hover:text-blue-600 transition">
+            <span class="w-2 h-2 bg-yellow-600 rounded-full group-hover:hidden"></span>
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity">Accessories</span>
+          </a>
+        </li>
+        <li>
+          <button onclick="toggleDarkMode()" class="mt-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-all hidden group-hover:block">Toggle Dark Mode</button>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-16 p-6 mt-20 md:mt-0 w-full">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% if products %}
+        {% for product in products %}
+        <div class="transform transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white/20 dark:bg-gray-800/30 backdrop-blur-md border border-white/30 dark:border-gray-700 rounded-2xl shadow-lg overflow-hidden">
+          <div class="relative">
+            <a href="{% url 'product_detail' product.id %}">
+              <img class="w-full h-48 object-fill" src="{{product.imageURL}}" alt="Product" />
+            </a>
+            <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">Sale</span>
+            <a href="{% url 'add_to_wishlist' product.id %}" class="absolute top-2 right-2 z-10">
+              {% if product.id in wishlisted_ids %}
+                <span class="text-red-500 animate-bounce hover:scale-125 transition-transform duration-300">❤️</span>
+              {% else %}
+                <span class="text-gray-400 hover:text-gray-600 transition">❤️</span>
+              {% endif %}
+            </a>
+          </div>
+          <div class="p-6 text-gray-800 dark:text-gray-100">
+            <h6 class="text-lg font-semibold mb-2 line-clamp-1">🌟 <strong>{{product.name}}</strong></h6>
+            <div class="flex space-x-1 text-yellow-400 text-sm mb-2">⭐⭐⭐⭐☆</div>
+            <hr class="border-white/30 mb-4" />
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <button data-product="{{product.id}}" data-action="add" class="px-4 py-2 bg-white/30 hover:bg-white/50 text-gray-800 dark:text-white font-medium rounded-lg shadow-md transition update-cart">Add to Cart</button>
+              <a href="{% url 'product_detail' product.id %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">View</a>
+              <h4 class="text-xl font-bold text-gray-900 dark:text-white">${{product.price|floatformat:2}}</h4>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center mt-12 text-gray-600 dark:text-gray-300">
+          <h2 class="text-2xl font-semibold mb-2">No products found 🛒</h2>
+          <p>Try changing the category or search term.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+
+<!-- Floating Mobile Buy Bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3 flex justify-around sm:hidden shadow-md z-40">
+  <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg">Buy Now</button>
+  <button class="bg-green-600 text-white px-4 py-2 rounded-lg">Add to Cart</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    window.toggleDarkMode = function () {
+      const htmlEl = document.documentElement;
+      htmlEl.classList.toggle("dark");
+      localStorage.setItem("theme", htmlEl.classList.contains("dark") ? "dark" : "light");
+    };
+  });
+</script>
+
+{% endblock content %}
